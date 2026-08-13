@@ -1,0 +1,1 @@
+using System.ComponentModel.DataAnnotations;namespace AuthService.DTOs;public record RegisterRequest([property:Required]string Username,[property:MinLength(6)]string Password,string Role="USER");public record LoginRequest(string Username,string Password);public record AuthResponse(string Token,Guid UserId,string Username,string Role,DateTime ExpiresAt);

@@ -1,0 +1,1 @@
+namespace InventoryService.Entities;public class Product{public Guid ProductId{get;set;}public string ProductName{get;set;}="";public int StockQty{get;set;}public bool IsActive{get;set;}=true;public DateTime CreatedAt{get;set;}public DateTime? UpdatedAt{get;set;}}

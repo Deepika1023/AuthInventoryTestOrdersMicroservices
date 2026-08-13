@@ -1,0 +1,17 @@
+using System.Text;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using OrderService.Data;
+using OrderService.Services;
+using Serilog;
+Log.Logger=new LoggerConfiguration().WriteTo.Console().WriteTo.File("logs/order-service-.log",rollingInterval:RollingInterval.Day).CreateLogger();var b=WebApplication.CreateBuilder(args);b.Host.UseSerilog();
+b.Services.AddControllers();
+b.Services.AddEndpointsApiExplorer();
+b.Services.AddSwaggerGen();
+b.Services.AddExceptionHandler<GlobalExceptionHandler>();
+b.Services.AddProblemDetails();
+b.Services.AddDbContext<OrderDbContext>(o=>o.UseNpgsql(b.Configuration.GetConnectionString("OrderDb")));var k=Encoding.UTF8.GetBytes(b.Configuration["Jwt:Key"]!);
+b.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(o=>o.TokenValidationParameters=new TokenValidationParameters{ValidateIssuer=false,ValidateAudience=false,ValidateLifetime=true,ValidateIssuerSigningKey=true,IssuerSigningKey=new SymmetricSecurityKey(k),RoleClaimType=System.Security.Claims.ClaimTypes.Role});
+b.Services.AddAuthorization();
+b.Services.AddHttpClient<InventoryClient>(c=>c.BaseAddress=new Uri(b.Configuration["InventoryService:BaseUrl"]!));b.Services.AddScoped<IOrder,OrderService>();var a=b.Build();a.UseExceptionHandler();a.UseSwagger();a.UseSwaggerUI();a.UseAuthentication();a.UseAuthorization();a.MapControllers();a.Run();
